@@ -150,7 +150,7 @@ export default function Timetable() {
       
       console.log('Sending validated subject:', validatedSubject);
       
-      const response = await fetch(`http://localhost:5000/update-subject/${dayId}`, {
+      const response = await fetch(`https://limca-classroom-backend.vercel.app/update-subject/${dayId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
