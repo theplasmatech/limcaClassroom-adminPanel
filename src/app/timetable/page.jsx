@@ -108,7 +108,7 @@ export default function Timetable() {
   const fetchTimetable = async () => {
     try {
       console.log('Fetching timetable data...');
-      const response = await fetch('http://localhost:5000/timetable');
+      const response = await fetch('https://limca-classroom-backend.vercel.app/timetable');
       if (!response.ok) throw new Error('Failed to fetch timetable');
       const data = await response.json();
       console.log('Fetched timetable data:', data);
@@ -341,7 +341,6 @@ export default function Timetable() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
