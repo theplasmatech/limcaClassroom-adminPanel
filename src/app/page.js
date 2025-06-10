@@ -15,7 +15,7 @@ export default function Home() {
       try {
         const response = await fetch('https://limca-classroom-backend.vercel.app/students-for-today');
         if (!response.ok) {
-          throw new Error("Failed to fetch today's students");
+          throw new Error("Failed to fetch todays students");
 
         }
         const data = await response.json();
