@@ -38,7 +38,7 @@ export default function AddStudentPage() {
       setLoading(true);
       setShowConfirmation(false);
       
-      const response = await fetch('http://localhost:5000/add-student', {
+      const response = await fetch('https://limca-classroom-backend.vercel.app/add-student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

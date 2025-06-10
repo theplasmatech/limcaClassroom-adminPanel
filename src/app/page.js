@@ -11,7 +11,7 @@ export default function Home() {
   useEffect(() => {
     const fetchTodayStudents = async () => {
       try {
-        const response = await fetch('http://localhost:5000/students-for-today');
+        const response = await fetch('https://limca-classroom-backend.vercel.app/students-for-today');
         if (!response.ok) {
           throw new Error('Failed to fetch today\'s students');
         }
@@ -29,7 +29,7 @@ export default function Home() {
 
   const handleMarkAttendance = async (studentId, dayId) => {
     try {
-      const response = await fetch('http://localhost:5000/mark-attendance', {
+      const response = await fetch('https://limca-classroom-backend.vercel.app/mark-attendance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export default function Home() {
       }
 
       // Refresh the students list after marking attendance
-      const updatedResponse = await fetch('http://localhost:5000/students-for-today');
+      const updatedResponse = await fetch('https://limca-classroom-backend.vercel.app/students-for-today');
       if (updatedResponse.ok) {
         const updatedData = await updatedResponse.json();
         setTodayStudents(updatedData);

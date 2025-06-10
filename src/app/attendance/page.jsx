@@ -13,7 +13,7 @@ export default function AttendanceCalendar() {
     const fetchAttendance = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/attendance');
+        const response = await fetch('https://limca-classroom-backend.vercel.app/attendance');
         if (!response.ok) {
           throw new Error('Failed to fetch attendance data');
         }
