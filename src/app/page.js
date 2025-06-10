@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
+
 
 export default function Home() {
   const [todayStudents, setTodayStudents] = useState(null);
@@ -13,7 +15,8 @@ export default function Home() {
       try {
         const response = await fetch('https://limca-classroom-backend.vercel.app/students-for-today');
         if (!response.ok) {
-          throw new Error('Failed to fetch today\'s students');
+          throw new Error("Failed to fetch today's students");
+
         }
         const data = await response.json();
         setTodayStudents(data);
@@ -95,7 +98,7 @@ export default function Home() {
         
         {/* Today's Students Section */}
         <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Today's Students</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Todays Students</h2>
           
           {loading && (
             <div className="text-center py-8">
@@ -132,11 +135,13 @@ export default function Home() {
                     <div key={student._id} className="px-6 py-4 flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         {student.profile_img ? (
-                          <img
-                            src={student.profile_img}
-                            alt={student.name}
-                            className="h-12 w-12 rounded-full object-cover"
-                          />
+                          <Image
+                          src={student.profile_img}
+                          alt={student.name}
+                          width={48}
+                          height={48}
+                          className="h-12 w-12 rounded-full object-cover"
+                        />                        
                         ) : (
                           <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
                             <span className="text-xl">👤</span>
