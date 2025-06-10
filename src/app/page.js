@@ -116,14 +116,6 @@ export default function Home() {
 
           {!loading && !error && todayStudents && (
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-gray-600">Date: {todayStudents.date}</p>
-                    <p className="text-sm text-gray-600">Day ID: {todayStudents.day_id}</p>
-                  </div>
-                </div>
-              </div>
               
               <div className="divide-y divide-gray-200">
                 {todayStudents.students.length === 0 ? (
@@ -149,6 +141,7 @@ export default function Home() {
                         )}
                         <div>
                           <h3 className="text-lg font-medium text-gray-900">{student.name}</h3>
+                          <p className="text-sm text-gray-500">{student.phone}</p>
                           <p className="text-sm text-gray-500">{student.email}</p>
                           <p className="text-sm text-gray-500">
                             {student.location} | {student.gender} | {student.last_qualification}
