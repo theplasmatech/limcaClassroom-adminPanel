@@ -17,13 +17,16 @@ export default function PasswordPage() {
     }
   }, [router]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // You can change this password to whatever you want
     if (password === 'admin123') {
       // Set cookie to expire in 24 hours
       Cookies.set('adminAuthenticated', 'true', { expires: 1 });
+      // Add a small delay to ensure cookie is set before navigation
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push('/');
+      router.refresh(); // Force a refresh of the router
     } else {
       setError('Invalid password');
     }
