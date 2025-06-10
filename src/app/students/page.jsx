@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:5000/students";
+const API_BASE = "https://limca-classroom-backend.vercel.app/list-of-students";
 
 export default function StudentsPage() {
   const [showExpired, setShowExpired] = useState(true);

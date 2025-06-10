@@ -20,7 +20,7 @@ export default function PasswordPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // You can change this password to whatever you want
-    if (password === 'admin123') {
+    if (password === 'LIMCA@2025') {
       // Set cookie to expire in 24 hours
       Cookies.set('adminAuthenticated', 'true', { expires: 1 });
       // Add a small delay to ensure cookie is set before navigation

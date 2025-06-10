@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const [activeItem, setActiveItem] = useState('Home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
 
   const navItems = [
     { name: 'Home', path: '/', icon: '🏠' },
@@ -21,20 +24,22 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  const handleLogout = () => {
+    Cookies.remove('adminAuthenticated');
+    router.push('/password');
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white" 
-         style={{ boxShadow: '0 4px 20px rgba(192, 192, 192, 0.3)' }}>
+         style={{ boxShadow: '0 2px 15px rgba(192, 192, 192, 0.5)' }}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           
           {/* Logo Section */}
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              
-              {/* Uncomment and use this for actual logo */}
-              <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+              <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
             </div>
-          
           </div>
 
           {/* Desktop Navigation */}
@@ -44,7 +49,7 @@ const Navbar = () => {
                 key={item.name}
                 href={item.path}
                 onClick={() => handleNavClick(item.name)}
-                className={`group relative px-4 py-2 text-sm font-light tracking-wide transition-all duration-300 ${
+                className={`group relative px-3 py-2 text-sm font-light tracking-wide transition-all duration-300 ${
                   activeItem === item.name
                     ? 'text-black'
                     : 'text-gray-600 hover:text-black'
@@ -61,11 +66,16 @@ const Navbar = () => {
                 {activeItem === item.name && (
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-black rounded-full"></div>
                 )}
-                
-                {/* Hover effect */}
-                <div className="absolute inset-0 bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
               </Link>
             ))}
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="ml-4 px-4 py-2 text-sm font-light text-gray-600 hover:text-black transition-colors duration-300 border border-gray-200 rounded-md hover:bg-gray-50"
+            >
+              Logout
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -111,13 +121,15 @@ const Navbar = () => {
                 </span>
               </Link>
             ))}
+            {/* Mobile Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-3 text-sm font-light text-gray-600 hover:text-black transition-colors duration-300 border-t border-gray-100"
+            >
+              Logout
+            </button>
           </div>
         </div>
-      </div>
-
-      {/* Quirky floating dot indicator */}
-      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-1">
-        <div className="w-1 h-1 bg-gray-300 rounded-full animate-pulse"></div>
       </div>
     </nav>
   );
