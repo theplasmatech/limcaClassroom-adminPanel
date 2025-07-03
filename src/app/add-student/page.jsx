@@ -18,8 +18,21 @@ export default function AddStudentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    let updatedValue = value;
+
+    if (name === 'email') {
+      updatedValue = value.toLowerCase();
+    }
+
+    if (name === 'phone') {
+      updatedValue = value.replace(/\D/g, '').slice(0, 10); // Keep only digits, max 10
+    }
+
+    setFormData({ ...formData, [name]: updatedValue });
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,15 +42,20 @@ export default function AddStudentPage() {
       return;
     }
 
-    // Show confirmation popup instead of directly submitting
+    if (!/^\d{10}$/.test(formData.phone)) {
+      setMessage('Phone number must be exactly 10 digits');
+      return;
+    }
+
     setShowConfirmation(true);
   };
+
 
   const confirmSubmission = async () => {
     try {
       setLoading(true);
       setShowConfirmation(false);
-      
+
       const response = await fetch('https://limca-classroom-backend.vercel.app/add-student', {
         method: 'POST',
         headers: {
@@ -93,19 +111,19 @@ export default function AddStudentPage() {
             <h2 className="text-sm font-medium text-gray-600 uppercase tracking-wider">
               Personal Details
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input 
-                label="Full Name" 
-                name="name" 
-                value={formData.name} 
+              <Input
+                label="Full Name"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter your name"
               />
-              <Input 
-                label="Phone Number" 
-                name="phone" 
-                value={formData.phone} 
+              <Input
+                label="Phone Number"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter phone number"
               />
@@ -134,7 +152,7 @@ export default function AddStudentPage() {
             <h2 className="text-sm font-medium text-gray-600 uppercase tracking-wider">
               Academic Details
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Last Qualification"
@@ -183,11 +201,10 @@ export default function AddStudentPage() {
 
           {/* Message Display */}
           {message && (
-            <div className={`p-4 text-center font-light ${
-              message.includes('successfully') 
-                ? 'text-black bg-gray-50' 
+            <div className={`p-4 text-center font-light ${message.includes('successfully')
+                ? 'text-black bg-gray-50'
                 : 'text-gray-700 bg-gray-50'
-            }`}>
+              }`}>
               {message}
             </div>
           )}
@@ -202,23 +219,23 @@ export default function AddStudentPage() {
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl">📧</span>
               </div>
-              
+
               <h3 className="text-xl font-light mb-4 text-black">
                 Confirm Email Address
               </h3>
-              
+
               <p className="text-gray-600 mb-2 font-light">
                 Please verify your email address:
               </p>
-              
+
               <div className="bg-gray-50 p-4 mb-6 border border-gray-200">
                 <span className="font-medium text-black">{formData.email}</span>
               </div>
-              
+
               <p className="text-sm text-gray-500 mb-8 font-light">
                 This email will be used for all communication regarding your registration.
               </p>
-              
+
               <div className="flex gap-4">
                 <button
                   onClick={cancelSubmission}
