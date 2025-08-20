@@ -11,6 +11,7 @@ export default function AddStudentPage() {
     last_qualification: '',
     location: '',
     joining_date: '',
+    batch_index: '', // ✅ Added batch
   });
 
   const [message, setMessage] = useState('');
@@ -33,7 +34,6 @@ export default function AddStudentPage() {
     setFormData({ ...formData, [name]: updatedValue });
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -47,9 +47,13 @@ export default function AddStudentPage() {
       return;
     }
 
+    if (formData.batch_index === '') {
+      setMessage('Please select a batch');
+      return;
+    }
+
     setShowConfirmation(true);
   };
-
 
   const confirmSubmission = async () => {
     try {
@@ -61,7 +65,10 @@ export default function AddStudentPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          batch_index: Number(formData.batch_index), // ensure integer
+        }),
       });
 
       if (!response.ok) {
@@ -78,6 +85,7 @@ export default function AddStudentPage() {
         last_qualification: '',
         location: '',
         joining_date: '',
+        batch_index: '',
       });
     } catch (error) {
       setMessage('Registration failed. Please try again');
@@ -177,6 +185,21 @@ export default function AddStudentPage() {
               value={formData.joining_date}
               onChange={handleChange}
             />
+
+            {/* ✅ Batch Selection */}
+            <Select
+              label="Batch"
+              name="batch_index"
+              value={formData.batch_index}
+              onChange={handleChange}
+              options={[
+                { label: 'Batch A', value: 0 },
+                { label: 'Batch B', value: 1 },
+                { label: 'Batch C', value: 2 },
+                { label: 'Batch D', value: 3 },
+              ]}
+              isBatch
+            />
           </div>
 
           {/* Submit Button */}
@@ -201,10 +224,13 @@ export default function AddStudentPage() {
 
           {/* Message Display */}
           {message && (
-            <div className={`p-4 text-center font-light ${message.includes('successfully')
-                ? 'text-black bg-gray-50'
-                : 'text-gray-700 bg-gray-50'
-              }`}>
+            <div
+              className={`p-4 text-center font-light ${
+                message.includes('successfully')
+                  ? 'text-black bg-gray-50'
+                  : 'text-gray-700 bg-gray-50'
+              }`}
+            >
               {message}
             </div>
           )}
@@ -233,7 +259,8 @@ export default function AddStudentPage() {
               </div>
 
               <p className="text-sm text-gray-500 mb-8 font-light">
-                This email will be used for all communication regarding your registration.
+                This email will be used for all communication regarding your
+                registration.
               </p>
 
               <div className="flex gap-4">
@@ -257,7 +284,7 @@ export default function AddStudentPage() {
         </div>
       )}
 
-      {/* Quirky Footer */}
+      {/* Footer */}
       <div className="border-t border-gray-100 mt-16">
         <div className="max-w-2xl mx-auto px-6 py-8 text-center">
           <p className="text-sm text-gray-400 font-light">
@@ -292,7 +319,7 @@ function Input({ label, name, value, onChange, type = 'text', placeholder }) {
 }
 
 // Select Component
-function Select({ label, name, value, onChange, options = [] }) {
+function Select({ label, name, value, onChange, options = [], isBatch = false }) {
   return (
     <div className="group relative">
       <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wide">
@@ -307,10 +334,20 @@ function Select({ label, name, value, onChange, options = [] }) {
                  appearance-none cursor-pointer"
         required
       >
-        <option value="" className="text-gray-400">Choose an option</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt} className="text-black">{opt}</option>
-        ))}
+        <option value="" className="text-gray-400">
+          Choose an option
+        </option>
+        {options.map((opt) =>
+          isBatch ? (
+            <option key={opt.value} value={opt.value} className="text-black">
+              {opt.label}
+            </option>
+          ) : (
+            <option key={opt} value={opt} className="text-black">
+              {opt}
+            </option>
+          )
+        )}
       </select>
     </div>
   );

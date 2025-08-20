@@ -108,7 +108,7 @@ export default function Timetable() {
   const fetchTimetable = async () => {
     try {
       console.log('Fetching timetable data...');
-      const response = await fetch('http://localhost:5000/timetable');
+      const response = await fetch('https://limca-classroom-backend.vercel.app/timetable');
       if (!response.ok) throw new Error('Failed to fetch timetable');
       const data = await response.json();
       console.log('Fetched timetable data:', data);
@@ -150,7 +150,7 @@ export default function Timetable() {
 
       console.log('Sending validated subject:', validatedSubject);
 
-      const response = await fetch(`http://localhost:5000/update-subject/${dayId}`, {
+      const response = await fetch(`https://limca-classroom-backend.vercel.app/update-subject/${dayId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -336,7 +336,7 @@ export default function Timetable() {
       if (mode === 'day') payload.day_id = dayId;
       if (mode === 'month') payload.month = month;
   
-      const response = await fetch('http://localhost:5000/toggle-batch', {
+      const response = await fetch('https://limca-classroom-backend.vercel.app/toggle-batch', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
