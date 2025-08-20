@@ -79,7 +79,7 @@ export default function Timetable() {
     const start = startOfMonth(date);
     const end = endOfMonth(date);
     const days = [];
-    
+
     // Add padding days from previous month
     const firstDayOfWeek = start.getDay();
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
@@ -87,12 +87,12 @@ export default function Timetable() {
       paddingDate.setDate(start.getDate() - i - 1);
       days.push(paddingDate);
     }
-    
+
     // Add all days of current month
     for (let d = 1; d <= end.getDate(); d++) {
       days.push(new Date(date.getFullYear(), date.getMonth(), d));
     }
-    
+
     // Add padding days from next month
     const lastDayOfWeek = end.getDay();
     for (let i = 1; i <= (6 - lastDayOfWeek); i++) {
@@ -100,7 +100,7 @@ export default function Timetable() {
       paddingDate.setDate(end.getDate() + i);
       days.push(paddingDate);
     }
-    
+
     return days;
   };
 
@@ -108,7 +108,7 @@ export default function Timetable() {
   const fetchTimetable = async () => {
     try {
       console.log('Fetching timetable data...');
-      const response = await fetch('https://limca-classroom-backend.vercel.app/timetable');
+      const response = await fetch('http://localhost:5000/timetable');
       if (!response.ok) throw new Error('Failed to fetch timetable');
       const data = await response.json();
       console.log('Fetched timetable data:', data);
@@ -124,12 +124,12 @@ export default function Timetable() {
   // Update subject for a day
   const updateSubject = async (dayId, subject) => {
     console.log('updateSubject called with:', { dayId, subject });
-    
+
     setUpdating(true);
     try {
       // Validate subject format before sending
       let validatedSubject = null;
-      
+
       if (subject !== null && subject !== undefined) {
         if (Array.isArray(subject)) {
           if (subject.length === 2) {
@@ -147,19 +147,21 @@ export default function Timetable() {
           throw new Error('Subject must be null or an array of two integers');
         }
       }
-      
+
       console.log('Sending validated subject:', validatedSubject);
-      
-      const response = await fetch(`https://limca-classroom-backend.vercel.app/update-subject/${dayId}`, {
+
+      const response = await fetch(`http://localhost:5000/update-subject/${dayId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ subject: validatedSubject }),
+        body: JSON.stringify(
+          subject === null ? { subject: null } : { subject }
+        ),
       });
 
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         const error = await response.json();
         console.error('Server error response:', error);
@@ -168,7 +170,7 @@ export default function Timetable() {
 
       const result = await response.json();
       console.log('Update successful:', result);
-      
+
       await fetchTimetable();
       setEditingDay(null);
       setEditSubject(['', '']);
@@ -187,10 +189,10 @@ export default function Timetable() {
     // Convert existing subjects to strings for editing, or empty strings
     const currentSubjects = entry.subject || [null, null];
     console.log('Current subjects:', currentSubjects);
-    
+
     // Handle the case where subject might be a single [week, number] pair
-    if (Array.isArray(currentSubjects) && currentSubjects.length === 2 && 
-        typeof currentSubjects[0] === 'number' && typeof currentSubjects[1] === 'number') {
+    if (Array.isArray(currentSubjects) && currentSubjects.length === 2 &&
+      typeof currentSubjects[0] === 'number' && typeof currentSubjects[1] === 'number') {
       setEditSubject([
         currentSubjects[0].toString(),
         currentSubjects[1].toString()
@@ -210,42 +212,42 @@ export default function Timetable() {
   // Handle edit save
   const saveEdit = (dayId) => {
     console.log('saveEdit called with:', { dayId, editSubject });
-    
+
     // Allow empty inputs (will send null)
     if (editSubject[0].trim() === '' && editSubject[1].trim() === '') {
       console.log('Both subjects empty, sending null');
       updateSubject(dayId, null);
       return;
     }
-    
+
     // Validate that both fields have values if any field has a value
     if (editSubject[0].trim() === '' || editSubject[1].trim() === '') {
       setError('Both week and subject number must be provided, or leave both empty to clear');
       return;
     }
-    
+
     // Convert to numbers
     const week = parseInt(editSubject[0].trim(), 10);
     const number = parseInt(editSubject[1].trim(), 10);
-    
+
     console.log('Parsed values:', { week, number });
-    
+
     if (isNaN(week) || isNaN(number)) {
       setError('Week and subject number must be valid numbers');
       return;
     }
-    
+
     // Validate ranges
     if (week < 1 || week > 4) {
       setError('Week must be between 1 and 4');
       return;
     }
-    
+
     if (number < 1 || number > 6) {
       setError('Subject number must be between 1 and 6');
       return;
     }
-    
+
     const numericSubject = [week, number];
     console.log('Sending numeric subject:', numericSubject);
     updateSubject(dayId, numericSubject);
@@ -268,7 +270,7 @@ export default function Timetable() {
     console.log('Drop event triggered');
     console.log('Dragged subject:', draggedSubject);
     console.log('Drop date:', date);
-    
+
     if (!draggedSubject) {
       console.log('No dragged subject, returning');
       return;
@@ -276,12 +278,12 @@ export default function Timetable() {
 
     const entry = getTimetableEntry(date);
     console.log('Target entry:', entry);
-    
+
     if (!entry) {
       console.log('No entry found for date, returning');
       return;
     }
-    
+
     if (isMonday(date)) {
       console.log('Cannot drop on Monday (holiday), returning');
       return;
@@ -316,7 +318,7 @@ export default function Timetable() {
   // Check if a date is from the current month
   const isCurrentMonth = (date) => {
     return date.getMonth() === currentMonth.getMonth() &&
-           date.getFullYear() === currentMonth.getFullYear();
+      date.getFullYear() === currentMonth.getFullYear();
   };
 
   if (loading) return (
@@ -324,12 +326,54 @@ export default function Timetable() {
       <div className="text-gray-800 text-lg">Loading calendar...</div>
     </div>
   );
+
+
+
+
+  const toggleBatch = async ({ batchIndex, mode, dayId = null, month = null }) => {
+    try {
+      const payload = { batch_index: batchIndex, mode };
+      if (mode === 'day') payload.day_id = dayId;
+      if (mode === 'month') payload.month = month;
   
+      const response = await fetch('http://localhost:5000/toggle-batch', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+  
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Batch toggle failed');
+      
+      console.log('Batch toggled successfully:', result);
+      fetchTimetable(); // Refresh calendar
+    } catch (err) {
+      console.error('Error toggling batch:', err);
+      setError(err.message);
+    }
+  };
+  
+
+  const toggleMonthBatch = async (batchIndex, month) => {
+    try {
+      await toggleBatch({ batchIndex, mode: 'month', month });
+    } catch (err) {
+      console.error('Error toggling batch for month:', err);
+      setError(err.message || 'Batch month toggle failed');
+    }
+  };
+  
+
+
+
+
+
+
   if (error) return (
     <div className="bg-white min-h-screen p-4">
       <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-center max-w-md mx-auto">
         <strong>Error:</strong> {error}
-        <button 
+        <button
           onClick={() => setError(null)}
           className="ml-4 text-red-600 hover:text-red-800 underline"
         >
@@ -366,6 +410,21 @@ export default function Timetable() {
             </svg>
           </button>
         </div>
+
+        {/* Toggle batches for whole month */}
+        <div className="flex gap-2 items-center my-4">
+  {[0, 1, 2, 3].map(index => (
+    <button
+      key={index}
+      onClick={() => toggleMonthBatch(index, formatDate(currentMonth).slice(0, 7))}
+      className="text-xs px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700"
+    >
+      Toggle B{index + 1} for Month
+    </button>
+  ))}
+</div>
+
+
 
         <div className="flex gap-8">
           {/* Subjects Reference Table */}
@@ -411,7 +470,7 @@ export default function Timetable() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Calendar Days */}
               <div className="grid grid-cols-7">
                 {getDaysInMonth(currentMonth).map((date, index) => {
@@ -419,33 +478,33 @@ export default function Timetable() {
                   const isHoliday = isMonday(date);
                   const isCurrentMonthDay = isCurrentMonth(date);
                   const isEditing = editingDay === entry?._id;
-                  
+
                   return (
                     <div
                       key={index}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, date)}
-                      className={`min-h-40 p-4 border-r border-b border-gray-200 last:border-r-0 transition-all duration-200 ${
-                        !isCurrentMonthDay 
-                          ? 'bg-gray-50' 
-                          : isHoliday 
-                            ? 'bg-red-50' 
-                            : 'bg-white hover:bg-gray-50'
-                      } ${!isHoliday && isCurrentMonthDay ? 'cursor-pointer' : ''}`}
+                      className={`min-h-40 p-4 border-r border-b border-gray-200 last:border-r-0 transition-all duration-200 ${!isCurrentMonthDay
+                        ? 'bg-gray-50'
+                        : isHoliday
+                          ? 'bg-red-50'
+                          : 'bg-white hover:bg-gray-50'
+                        } ${!isHoliday && isCurrentMonthDay ? 'cursor-pointer' : ''}`}
                     >
                       {/* Date Number */}
-                      <div className={`font-medium text-base mb-2 ${
-                        !isCurrentMonthDay 
-                          ? 'text-gray-400' 
-                          : isHoliday 
-                            ? 'text-red-600' 
-                            : 'text-gray-900'
-                      }`}>
+                      <div className={`font-medium text-base mb-2 ${!isCurrentMonthDay
+                        ? 'text-gray-400'
+                        : isHoliday
+                          ? 'text-red-600'
+                          : 'text-gray-900'
+                        }`}>
                         {date.getDate()}
                         {isHoliday && (
                           <span className="block text-xs text-red-500 font-normal">Holiday</span>
                         )}
                       </div>
+
+
 
                       {/* Subject Information */}
                       {entry && !isHoliday && isCurrentMonthDay && (
@@ -453,6 +512,7 @@ export default function Timetable() {
                           {!isEditing ? (
                             // Display Mode
                             <div>
+                              {/* Subject Display */}
                               {entry.subject && Array.isArray(entry.subject) && entry.subject.length === 2 ? (
                                 <div className="group relative">
                                   <div className="flex items-center justify-between bg-green-50 rounded-lg p-2 transition-all duration-200 hover:bg-green-100">
@@ -470,6 +530,31 @@ export default function Timetable() {
                               ) : (
                                 <div className="text-sm text-gray-400 italic border-2 border-dashed border-gray-200 rounded-lg p-2 text-center">
                                   Drop subject here
+                                </div>
+                              )}
+
+                              {/* Batches */}
+                              {entry.batches && Array.isArray(entry.batches) && (
+                                <div className="mt-2 grid grid-cols-4 gap-1">
+                                  {entry.batches.map((isActive, index) => (
+                                    <button
+                                      key={index}
+                                      onClick={() =>
+                                        toggleBatch({
+                                          batchIndex: index,
+                                          status: !isActive,
+                                          mode: 'day',
+                                          dayId: entry._id,
+                                        })
+                                      }
+                                      className={`text-[10px] w-full text-center px-1 py-0.5 rounded-full font-medium transition-colors duration-150${isActive
+                                        ? 'bg-blue-100 text-blue-800 border border-blue-300 hover:bg-blue-200'
+                                        : 'bg-gray-100 text-gray-400 border border-gray-200 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                      B{index + 1}
+                                    </button>
+                                  ))}
                                 </div>
                               )}
                             </div>
@@ -514,6 +599,7 @@ export default function Timetable() {
                           )}
                         </div>
                       )}
+
                     </div>
                   );
                 })}
